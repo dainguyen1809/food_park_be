@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use Google_Client;
@@ -13,7 +12,9 @@ class GoogleOAuthController extends Controller
 {
     public function redirectToGoogle()
     {
-        return Socialite::driver('google')->stateless()->redirect();
+        return response()->json([
+            'redirect_url' => Socialite::driver('google')->stateless()->redirect()->getTargetUrl()
+        ]);
     }
 
     public function handleGoogleCallback()
@@ -26,13 +27,13 @@ class GoogleOAuthController extends Controller
                 'name' => $googleUser->getName(),
                 'google_id' => $googleUser->getId(),
                 'avatar' => $googleUser->getAvatar(),
+                'password' => str()->password(10)
             ]
         );
-
         // Đăng nhập
-        Auth::login($user);
+        auth()->login($user);
 
-        return redirect()->route('home');
+        return redirect(config('app.frontend_url'));
     }
 
     public function handleOneTapCallback(Request $request)
