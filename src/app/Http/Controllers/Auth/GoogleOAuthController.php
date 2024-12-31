@@ -30,32 +30,38 @@ class GoogleOAuthController extends Controller
                 'password' => str()->password(10)
             ]
         );
+
         // Đăng nhập
         auth()->login($user);
 
-        return redirect(config('app.frontend_url'));
+        $redirectUrl = config('app.frontend_url').'/test';
+        // if ($user->isAdmin()) {
+        //     $redirectUrl = config('app.frontend_url') . '/admin';
+        // }
+
+        return redirect($redirectUrl);
     }
 
-    public function handleOneTapCallback(Request $request)
-    {
-        $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
-        $payload = $client->verifyIdToken($request->credential);
+    // public function handleOneTapCallback(Request $request)
+    // {
+    //     $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+    //     $payload = $client->verifyIdToken($request->credential);
 
-        if ($payload) {
-            $user = User::updateOrCreate(
-                ['email' => $payload['email']],
-                [
-                    'name' => $payload['name'],
-                    'google_id' => $payload['sub'],
-                    'avatar' => $payload['picture'],
-                ]
-            );
+    //     if ($payload) {
+    //         $user = User::updateOrCreate(
+    //             ['email' => $payload['email']],
+    //             [
+    //                 'name' => $payload['name'],
+    //                 'google_id' => $payload['sub'],
+    //                 'avatar' => $payload['picture'],
+    //             ]
+    //         );
 
-            Auth::login($user);
+    //         Auth::login($user);
 
-            return response()->json(['success' => true]);
-        }
+    //         return response()->json(['success' => true]);
+    //     }
 
-        return response()->json(['success' => false], 401);
-    }
+    //     return response()->json(['success' => false], 401);
+    // }
 }
