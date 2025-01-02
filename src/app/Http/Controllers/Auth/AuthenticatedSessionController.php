@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,13 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): Response
     {
-        $request->authenticate();
+        $user = User::where('email', $request->email)->first();
+
+        if ($user && ($user->google_id || $user->facebook_id)) {
+            Auth::login($user);
+        } else {
+            $request->authenticate();
+        }
 
         $request->session()->regenerate();
 

@@ -40,7 +40,7 @@ class FacebookOAuthController extends Controller
                 $newUser = User::updateOrCreate(['email' => $user->email], [
                     'name' => $user->name,
                     'facebook_id' => $user->id,
-                    'password' => str()->password(10)
+                    'password' => bcrypt(str()->password(10))
                 ]);
 
                 Auth::login($newUser);

@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use Google_Client;
+use Illuminate\Support\Facades\Hash;
 
 class GoogleOAuthController extends Controller
 {
@@ -27,7 +28,7 @@ class GoogleOAuthController extends Controller
                 'name' => $googleUser->getName(),
                 'google_id' => $googleUser->getId(),
                 'avatar' => $googleUser->getAvatar(),
-                'password' => str()->password(10)
+                'password' => Hash::make(str()->password(10))
             ]
         );
 
