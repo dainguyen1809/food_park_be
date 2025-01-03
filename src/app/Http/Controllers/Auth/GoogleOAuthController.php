@@ -36,9 +36,6 @@ class GoogleOAuthController extends Controller
         auth()->login($user);
 
         $redirectUrl = config('app.frontend_url').'/test';
-        // if ($user->isAdmin()) {
-        //     $redirectUrl = config('app.frontend_url') . '/admin';
-        // }
 
         return redirect($redirectUrl);
     }

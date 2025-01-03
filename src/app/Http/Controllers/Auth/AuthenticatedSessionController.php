@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class AuthenticatedSessionController extends Controller
@@ -14,7 +13,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): Response
+    public function store(LoginRequest $request)
     {
         $user = User::where('email', $request->email)->first();
 
@@ -24,15 +23,25 @@ class AuthenticatedSessionController extends Controller
             $request->authenticate();
         }
 
-        $request->session()->regenerate();
+        $token = $request->session()->regenerate();
 
-        return response()->noContent();
+        $redirectUrl = match (Auth::user()->role) {
+            'admin' => env('FRONTEND_URL').'/admin/dashboard',
+            'user' => env('FRONTEND_URL').'/dashboard',
+            default => env('FRONTEND_URL').'/dashboard',
+        };
+
+        return response()->json([
+            'message' => 'Login successful.',
+            // 'redirect_url' => $redirectUrl,
+            'role' => Auth::user()->role
+        ], 200);
     }
 
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request): Response
+    public function destroy(Request $request)
     {
         Auth::guard('web')->logout();
 
@@ -40,6 +49,9 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return response()->noContent();
+        return response()->json([
+            'statusCode' => 200,
+            'message' => 'Logout successfully.',
+        ], 200);
     }
 }
